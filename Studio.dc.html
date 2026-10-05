@@ -129,7 +129,7 @@ button,input,select{font-family:inherit}
   <!-- 1. App bar: identity only -->
   <header style="height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: #FFFFFF">
     <div style="display: flex; align-items: center; gap: 12px">
-      <button id="backBtn" aria-label="Back" onclick="history.back()" style="width: 32px; height: 32px; flex-shrink: 0; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <button id="backBtn" aria-label="Back" aria-haspopup="dialog" style="width: 32px; height: 32px; flex-shrink: 0; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15171C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
       </button>
       <div style="display: flex; align-items: center; gap: 10px">
@@ -395,68 +395,18 @@ button,input,select{font-family:inherit}
     </div>
   </div>
   <div id="toast" class="toast" role="status" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7FD19E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="toastMsg"></span></div>
-  <!-- Share or download dialog (opens from the Export menu) -->
+  <!-- Download dialog (opens from the Export menu) -->
   <div id="shareScrim" hidden>
     <div class="sh-dialog" role="dialog" aria-modal="true" aria-labelledby="shTitle">
       <div class="sh-head">
-        <div><h2 id="shTitle">Share or download</h2><p class="sh-sub" id="shSub"></p></div>
+        <div><h2 id="shTitle">Download</h2><p class="sh-sub" id="shSub"></p></div>
         <button class="sh-x" id="shClose" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B5E66" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      </div>
-      <div class="sh-tabs" role="tablist" aria-label="Share or download">
-        <button class="sh-tab" role="tab" id="shTabLink" data-tab="link" aria-selected="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.43"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.33-1.33"/></svg>Share link</button>
-        <button class="sh-tab" role="tab" id="shTabDl" data-tab="dl" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v6"/><path d="m9.5 14.5 2.5 2.5 2.5-2.5"/></svg>Download</button>
       </div>
       <div class="sh-body">
         <div class="sh-live" id="shLive" role="status" aria-live="polite"></div>
 
-        <!-- Share link -->
-        <div id="shLinkPane" role="tabpanel" aria-labelledby="shTabLink">
-          <div id="shLinkForm">
-            <div class="sh-seg" role="radiogroup" aria-label="What people with the link can do">
-              <button role="radio" aria-checked="true" data-perm="view">Link for viewing</button>
-              <button role="radio" aria-checked="false" data-perm="edit">Link for editing</button>
-            </div>
-            <div class="sh-card">
-              <div class="sh-card-head"><span class="sh-circ"><svg id="shPermIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span id="shPermText">People with this link can view</span></div>
-              <div class="sh-row">
-                <div class="sh-lab"><b>Who has access</b><small>Control who can open this dataset with the link.</small></div>
-                <select class="sh-select" id="shAccess" aria-label="Who has access"><option value="anyone">Anyone with link</option><option value="workspace">People in this workspace</option><option value="invite">Only people I invite</option></select>
-              </div>
-              <div class="sh-row">
-                <div class="sh-lab"><b>Expiration</b><small>Disable this link on a specific date.</small></div>
-                <div class="sh-ctl"><label class="sh-switch"><span id="shExpState">On</span><input type="checkbox" role="switch" id="shExp" aria-label="Expiration"><span class="sh-track" aria-hidden="true"></span></label><input class="sh-date" type="date" id="shExpDate" aria-label="Expiration date"></div>
-              </div>
-              <div class="sh-row">
-                <div class="sh-lab"><b>Require password</b><small>Set a password to limit access to the dataset via link.</small></div>
-                <div class="sh-ctl"><label class="sh-switch"><span id="shPwState">Off</span><input type="checkbox" role="switch" id="shPwOn" aria-label="Require password"><span class="sh-track" aria-hidden="true"></span></label><input class="sh-date" type="text" id="shPw" placeholder="Set a password" autocomplete="off" aria-label="Password"><small class="sh-err" id="shPwErr" hidden>Use at least 4 characters.</small></div>
-              </div>
-              <div class="sh-row sh-last">
-                <div class="sh-lab"><b>Disable downloads</b><small>Prevent people with this link from downloading the data.</small></div>
-                <div class="sh-ctl"><label class="sh-switch"><span id="shDisState">Off</span><input type="checkbox" role="switch" id="shNoDl" aria-label="Disable downloads"><span class="sh-track" aria-hidden="true"></span></label></div>
-              </div>
-            </div>
-            <div class="sh-actions"><button class="sh-btn" id="shCancel">Cancel</button><button class="sh-btn sh-primary" id="shCreate">Create link</button></div>
-          </div>
-
-          <div class="sh-state" id="shLinkBusy" hidden>
-            <div class="sh-spin" aria-hidden="true"></div>
-            <h3 id="shLinkBusyText">Creating your link…</h3>
-            <p>This only takes a moment.</p>
-            <button class="sh-textbtn" id="shLinkBusyCancel">Cancel</button>
-          </div>
-
-          <div class="sh-state" id="shLinkReady" hidden>
-            <div class="sh-ok" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1D6B3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.43"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.33-1.33"/></svg></div>
-            <h3>Your link is ready</h3>
-            <p id="shReadyDesc"></p>
-            <div class="sh-copy"><input class="sh-url" id="shUrl" readonly aria-label="Share link"><button class="sh-btn sh-primary" id="shCopy">Copy link</button></div>
-            <ul class="sh-chips" id="shChips"></ul>
-            <div class="sh-links"><button class="sh-textbtn" id="shEdit">Edit settings</button><button class="sh-textbtn sh-danger" id="shDelete">Delete link</button></div>
-          </div>
-        </div>
-
         <!-- Download -->
-        <div id="shDlPane" role="tabpanel" aria-labelledby="shTabDl" hidden>
+        <div id="shDlPane">
           <div id="shDlForm" class="sh-state sh-state-form">
             <svg class="sh-file" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M14 6h24l14 14v34a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z" fill="#E6F1FF"/><path d="M38 6v10a4 4 0 0 0 4 4h10z" fill="#0077FF"/><path d="M20 32h24M20 39h16" stroke="#0077FF" stroke-width="2.5" stroke-linecap="round"/></svg>
             <h3 id="shDlTitle">Download the dataset</h3>
@@ -480,6 +430,22 @@ button,input,select{font-family:inherit}
             <button class="sh-textbtn" id="shDlAgain">Choose another format</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save project dialog (opens from the Back button) -->
+  <div id="leaveScrim" hidden>
+    <div class="lv-dialog" role="dialog" aria-modal="true" aria-labelledby="lvTitle" aria-describedby="lvDesc">
+      <button class="lv-x" id="lvClose" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B5E66" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <div class="lv-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></div>
+      <h2 id="lvTitle">Save your project?</h2>
+      <p class="lv-desc" id="lvDesc"></p>
+      <label class="lv-field"><span>Project name</span><input id="lvName" type="text" maxlength="40" autocomplete="off" spellcheck="false"></label>
+      <div class="lv-actions">
+        <button class="lv-btn lv-ghost" id="lvCancel">Cancel</button>
+        <button class="lv-btn" id="lvDiscard">Don't save</button>
+        <button class="lv-btn lv-primary" id="lvSave">Save project</button>
       </div>
     </div>
   </div>
@@ -726,7 +692,7 @@ class Component extends DCLogic {
   .ex-hint { margin-left: auto; font-family: 'Geist Mono', monospace; font-size: 11px; color: #5B5E66; }
   .ex-sep { height: 1px; flex-shrink: 0; margin: 4px 10px; background: #ECEAE4; }
 
-  /* Share or download dialog */
+  /* Download dialog */
   #shareScrim { --bg:#F4F3EF; --sunken:#FAF9F6; --line:#E4E2DC; --line-soft:#ECEAE4; --line-strong:#D9D6CE; --ink:#15171C; --ink-2:#3C3F46; --muted:#5B5E66; --accent:#0077FF; --accent-ink:#0060D6; --accent-ring:#CCE4FF; --err-ink:#8F1B12; --mono:'Geist Mono',ui-monospace,monospace; position: fixed; inset: 0; z-index: 30; background: rgba(21,23,28,.32); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink); }
   #shareScrim[hidden], #shareScrim [hidden] { display: none !important; }
   #shareScrim, #shareScrim * { box-sizing: border-box; }
@@ -740,40 +706,13 @@ class Component extends DCLogic {
   .sh-sub { margin: 4px 0 0; font-size: 13px; color: var(--muted); font-family: var(--sub-font); }
   .sh-x { width: 32px; height: 32px; flex-shrink: 0; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; }
   .sh-x:hover { background: var(--bg); }
-  .sh-tabs { display: flex; margin: 16px 24px 0; border-bottom: 1px solid var(--line); }
-  .sh-tab { flex: 1; height: 44px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-weight: 500; }
-  .sh-tab:hover { color: var(--ink); }
-  .sh-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
   .sh-body { padding: 20px 24px 24px; overflow: auto; }
   .sh-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  .sh-seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; background: #F1EFEA; border-radius: 10px; margin-bottom: 14px; }
-  .sh-seg button { height: 32px; border: 0; border-radius: 8px; background: transparent; font-size: 13px; font-weight: 500; color: var(--muted); }
-  .sh-seg button[aria-checked="true"] { background: #fff; box-shadow: 0 1px 2px rgba(21,23,28,.08); color: var(--ink); }
-  .sh-card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-  .sh-card-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #F7F6F3; border-bottom: 1px solid var(--line); font-size: 13px; }
-  .sh-circ { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line-strong); background: #fff; display: flex; align-items: center; justify-content: center; color: var(--ink-2); }
-  .sh-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 14px; border-bottom: 1px solid var(--line-soft); }
-  .sh-row.sh-last { border-bottom: 0; }
-  .sh-lab { display: flex; flex-direction: column; gap: 3px; max-width: 220px; }
-  .sh-lab b { font-size: 14px; font-weight: 500; }
-  .sh-lab small { font-size: 12px; line-height: 1.4; color: var(--muted); }
-  .sh-ctl { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .sh-select { height: 34px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: #F4F3EF; font-weight: 500; font-size: 13px; }
   .sh-select.sh-wide { width: 100%; height: 38px; background: #fff; font-size: 14px; font-weight: 400; }
-  .sh-date { height: 34px; width: 170px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: #fff; font-family: var(--mono); font-size: 13px; }
-  .sh-select:focus, .sh-date:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
-  .sh-err { color: var(--err-ink); font-size: 12px; }
-  .sh-switch { position: relative; display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); cursor: pointer; }
-  .sh-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-  .sh-track { position: relative; width: 40px; height: 22px; border-radius: 11px; border: 1.5px solid var(--ink); background: #fff; transition: background .15s; }
-  .sh-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 13px; height: 13px; border-radius: 50%; background: var(--ink); transition: transform .15s, background .15s; }
-  .sh-switch input:checked + .sh-track { background: var(--ink); }
-  .sh-switch input:checked + .sh-track::after { transform: translateX(18px); background: #fff; }
-  .sh-switch input:focus-visible + .sh-track { outline: 2px solid var(--accent); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) { .sh-track, .sh-track::after { transition: none; } }
+  .sh-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 
-  .sh-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
   .sh-btn { height: 36px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
   .sh-btn:hover:not(:disabled) { background: var(--sunken); }
   .sh-primary { border: 0; background: var(--accent); color: #fff; }
@@ -782,7 +721,6 @@ class Component extends DCLogic {
   .sh-pill { border-radius: 999px; padding: 0 28px; }
   .sh-textbtn { border: 0; background: transparent; padding: 4px 6px; font-size: 13px; font-weight: 500; color: var(--accent); }
   .sh-textbtn:hover { text-decoration: underline; }
-  .sh-danger { color: var(--err-ink); }
 
   .sh-state { min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; }
   .sh-state-form { min-height: 0; padding: 4px 0 0; }
@@ -794,12 +732,30 @@ class Component extends DCLogic {
   .sh-spin { width: 40px; height: 40px; border-radius: 50%; border: 3.5px solid #CCE4FF; border-top-color: var(--accent); animation: sh-spin .8s linear infinite; }
   @keyframes sh-spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .sh-spin { animation: none; border-top-color: #CCE4FF; border-right-color: var(--accent); } }
-  .sh-ok { width: 52px; height: 52px; border-radius: 50%; background: #E3F2E8; display: flex; align-items: center; justify-content: center; }
-  .sh-copy { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-  .sh-url { flex: 1; min-width: 0; height: 40px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--sunken); font-family: var(--mono); font-size: 12px; }
-  .sh-chips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-  .sh-chips li { padding: 3px 10px; border-radius: 12px; background: #F1EFEA; color: var(--ink-2); font-size: 12px; }
-  .sh-links { display: flex; gap: 14px; margin-top: 6px; }
+  /* Save project dialog */
+  #leaveScrim { --line-strong:#D9D6CE; --ink:#15171C; --ink-2:#3C3F46; --muted:#5B5E66; --accent:#0077FF; --accent-ink:#0060D6; --accent-ring:#CCE4FF; position: fixed; inset: 0; z-index: 40; background: rgba(21,23,28,.32); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink); }
+  #leaveScrim[hidden] { display: none !important; }
+  #leaveScrim, #leaveScrim * { box-sizing: border-box; }
+  :where(#leaveScrim) :is(button, input) { font: inherit; color: inherit; }
+  #leaveScrim button { cursor: pointer; }
+  #leaveScrim button:disabled { cursor: default; opacity: .6; }
+  #leaveScrim :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .lv-dialog { position: relative; width: 440px; max-width: calc(100% - 32px); background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(21,23,28,.28); padding: 28px 24px 22px; }
+  .lv-x { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; }
+  .lv-x:hover { background: #F4F3EF; }
+  .lv-icon { width: 44px; height: 44px; border-radius: 12px; background: #E6F1FF; color: #0077FF; display: flex; align-items: center; justify-content: center; }
+  .lv-dialog h2 { margin: 16px 0 0; font-family: var(--heading-font); font-stretch: 125%; font-size: 19px; font-weight: 500; letter-spacing: -.02em; }
+  .lv-desc { margin: 6px 0 0; font-family: var(--sub-font); font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .lv-field { display: flex; flex-direction: column; gap: 6px; margin-top: 18px; }
+  .lv-field > span { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+  .lv-field input { height: 38px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: #fff; font-size: 14px; }
+  .lv-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+  .lv-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+  .lv-btn { height: 36px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; font-weight: 500; white-space: nowrap; }
+  .lv-btn:hover:not(:disabled) { background: #FAF9F6; }
+  .lv-ghost { border-color: transparent; color: var(--muted); }
+  .lv-primary { border: 0; background: var(--accent); color: #fff; }
+  .lv-primary:hover:not(:disabled) { background: var(--accent-ink) !important; }
   #wsName:hover { background: #F4F3EF; }
   #wsName:focus-visible { box-shadow: 0 0 0 2px #99C8FF; }
   #wsName[contenteditable="plaintext-only"], #wsName[contenteditable="true"] { background: #FFFFFF; color: #15171C; box-shadow: 0 0 0 1.5px #0077FF; text-overflow: clip; cursor: text; }
@@ -2047,190 +2003,92 @@ class Component extends DCLogic {
   $('nullColSelect').addEventListener('change', updateNulls);
   $('rsPair').addEventListener('change', function (e) { rs = { choice: 'fill', pair: +e.target.value }; renderResolve(); });
 
-  // Small API for the share / download dialog
+  // Small API for the download and save-project dialogs
   window.studio = {
     current: function () { var d = DS[active]; return { name: d.name, total: d.total, cols: d.cols.length, changes: d.changes, kind: d.kind }; },
+    unsaved: function () { return order.reduce(function (n, id) { return n + (DS[id].changes || 0); }, 0); },
     toast: toast
   };
 
   renderAll();
 })();
 
-// Share or download: opens from the Export menu. A format goes straight to "preparing", "Share link…" opens the link settings.
+// Download dialog: opens from the Export menu. Picking a file format goes straight to "preparing".
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var api = window.studio;
-  var scrim = $('shareScrim'), tab = 'link';
+  var scrim = $('shareScrim');
   var FMT = { csv: ['CSV', '.csv'], xlsx: ['Excel', '.xlsx'], json: ['JSON', '.json'], xml: ['XML', '.xml'] };
-  var ACCESS = { anyone: 'Anyone with the link', workspace: 'People in this workspace', invite: 'Only people I invite' };
   var DELAY = 1600;
-  var links = {};                       // the active link for each dataset, by name
-  var st = { link: 'form', dl: 'form' };
-  var timers = {};
-  var draft = null;
+  var st = 'form';
+  var timer = null;
 
-  function iso(days) { var d = new Date(); d.setDate(d.getDate() + days); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function niceDate(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
-  function defaults() { return { perm: 'view', access: 'anyone', expOn: true, expDate: iso(30), pwOn: false, pw: '', noDl: false }; }
-  function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function fileBase(name) { return name.replace(/\.[a-z0-9]+$/i, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
-  function newUrl() { return 'https://studio.example/s/' + Math.random().toString(36).slice(2, 10); }
   function live(msg) { $('shLive').textContent = msg; }
-
-  /* ----- link form <-> draft ----- */
-  function writeForm() {
-    var s = draft;
-    [].forEach.call(document.querySelectorAll('[data-perm]'), function (b) { b.setAttribute('aria-checked', String(b.dataset.perm === s.perm)); });
-    $('shPermText').textContent = 'People with this link can ' + s.perm;
-    $('shAccess').value = s.access;
-    $('shExp').checked = s.expOn; $('shExpDate').value = s.expDate; $('shExpDate').min = iso(0);
-    $('shPwOn').checked = s.pwOn; $('shPw').value = s.pw;
-    $('shNoDl').checked = s.noDl;
-    syncForm();
-  }
-  function syncForm() {
-    var s = draft;
-    $('shExpState').textContent = s.expOn ? 'On' : 'Off'; $('shExpDate').hidden = !s.expOn;
-    $('shPwState').textContent = s.pwOn ? 'On' : 'Off'; $('shPw').hidden = !s.pwOn;
-    $('shDisState').textContent = s.noDl ? 'On' : 'Off';
-    var pwBad = s.pwOn && s.pw.length < 4, dateBad = s.expOn && !s.expDate;
-    $('shPwErr').hidden = !(pwBad && s.pw.length > 0);
-    $('shCreate').disabled = pwBad || dateBad;
-    $('shCreate').textContent = links[api.current().name] ? 'Save changes' : 'Create link';
-  }
-  function readForm() {
-    var s = draft;
-    s.access = $('shAccess').value; s.expOn = $('shExp').checked; s.expDate = $('shExpDate').value;
-    s.pwOn = $('shPwOn').checked; s.pw = $('shPw').value; s.noDl = $('shNoDl').checked;
-    syncForm();
-  }
 
   /* ----- rendering ----- */
   function render() {
     var d = api.current();
     $('shSub').textContent = d.name + ' · ' + d.total.toLocaleString('en-US') + ' rows · ' + d.cols + ' columns' + (d.changes ? ' · ' + d.changes + ' change' + (d.changes > 1 ? 's' : '') + ' applied' : '');
-    [].forEach.call(document.querySelectorAll('.sh-tab'), function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === tab)); });
-    $('shLinkPane').hidden = tab !== 'link'; $('shDlPane').hidden = tab !== 'dl';
-    $('shLinkForm').hidden = st.link !== 'form'; $('shLinkBusy').hidden = st.link !== 'busy'; $('shLinkReady').hidden = st.link !== 'ready';
-    $('shDlForm').hidden = st.dl !== 'form'; $('shDlBusy').hidden = st.dl !== 'busy'; $('shDlReady').hidden = st.dl !== 'ready';
+    $('shDlForm').hidden = st !== 'form'; $('shDlBusy').hidden = st !== 'busy'; $('shDlReady').hidden = st !== 'ready';
     var f = FMT[$('shFmt').value];
     $('shDlTitle').textContent = 'Download ' + d.name;
     $('shDlDesc').textContent = 'All ' + d.total.toLocaleString('en-US') + ' rows and ' + d.cols + ' columns' + (d.changes ? ', with your ' + d.changes + ' change' + (d.changes > 1 ? 's' : '') + ' applied' : '') + '.';
     $('shDlBusyText').textContent = 'Preparing your ' + f[0] + ' file…';
     $('shDlReadyDesc').textContent = 'After downloading your ' + f[0] + ' file, check it to make sure everything looks ok.';
     $('shDlFile').textContent = 'Download ' + fileBase(d.name) + f[1];
-    var l = links[d.name];
-    $('shLinkBusyText').textContent = l ? 'Updating your link…' : 'Creating your link…';
-    if (l && st.link === 'ready') fillReady(l);
-  }
-  function fillReady(l) {
-    var s = l.settings;
-    $('shUrl').value = l.url;
-    $('shReadyDesc').textContent = ({ anyone: 'Anyone with the link', workspace: 'People in this workspace', invite: 'People you invite' })[s.access] + ' can ' + s.perm + ' this dataset.';
-    var chips = [ACCESS[s.access], s.perm === 'edit' ? 'Can edit' : 'Can view', s.expOn ? 'Expires ' + niceDate(s.expDate) : 'No expiry', s.pwOn ? 'Password required' : 'No password', s.noDl ? 'Downloads off' : 'Downloads on'];
-    $('shChips').innerHTML = chips.map(function (c) { return '<li>' + c.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</li>'; }).join('');
   }
 
   /* ----- open / close ----- */
-  function open(which, o) {
+  function open(o) {
     o = o || {};
-    var d = api.current(), l = links[d.name];
-    clearTimeout(timers.link); clearTimeout(timers.dl);
-    tab = which;
-    draft = l ? clone(l.settings) : defaults();
-    st.link = l ? 'ready' : 'form';
-    st.dl = 'form';
+    clearTimeout(timer);
+    st = 'form';
     if (o.fmt) $('shFmt').value = o.fmt;
-    writeForm();
     scrim.hidden = false;
     render();
-    if (which === 'dl' && o.auto) { startDl(); return; }
+    if (o.auto) { startDl(); return; }
     focusPane();
   }
   function close() {
-    clearTimeout(timers.link); clearTimeout(timers.dl);
+    clearTimeout(timer);
     scrim.hidden = true;
     $('dlBtn').focus();
   }
   function focusPane() {
-    var el = tab === 'link'
-      ? (st.link === 'ready' ? $('shCopy') : st.link === 'busy' ? $('shLinkBusyCancel') : document.querySelector('[data-perm][aria-checked="true"]'))
-      : (st.dl === 'ready' ? $('shDlFile') : st.dl === 'busy' ? $('shDlBusyCancel') : $('shFmt'));
+    var el = st === 'ready' ? $('shDlFile') : st === 'busy' ? $('shDlBusyCancel') : $('shFmt');
     if (el) el.focus();
-  }
-
-  /* ----- link ----- */
-  function startLink() {
-    var name = api.current().name;
-    st.link = 'busy'; render(); focusPane();
-    live($('shLinkBusyText').textContent);
-    timers.link = setTimeout(function () {
-      var prev = links[name];
-      links[name] = { settings: clone(draft), url: prev ? prev.url : newUrl() };
-      st.link = 'ready'; render(); focusPane();
-      live('Your link is ready.');
-    }, DELAY);
-  }
-  function cancelLink() {
-    clearTimeout(timers.link);
-    st.link = links[api.current().name] ? 'ready' : 'form';
-    render(); focusPane();
   }
 
   /* ----- download ----- */
   function startDl() {
-    st.dl = 'busy'; tab = 'dl'; render(); focusPane();
+    st = 'busy'; render(); focusPane();
     live($('shDlBusyText').textContent);
-    timers.dl = setTimeout(function () {
-      st.dl = 'ready'; render(); focusPane();
+    timer = setTimeout(function () {
+      st = 'ready'; render(); focusPane();
       live('Your download is ready.');
     }, DELAY);
   }
-  function cancelDl() { clearTimeout(timers.dl); st.dl = 'form'; render(); focusPane(); }
+  function cancelDl() { clearTimeout(timer); st = 'form'; render(); focusPane(); }
 
   /* ----- events ----- */
   $('shClose').addEventListener('click', close);
-  $('shCancel').addEventListener('click', close);
   var downOnScrim = false;
   scrim.addEventListener('mousedown', function (e) { downOnScrim = e.target === scrim; });
   scrim.addEventListener('click', function (e) { if (e.target === scrim && downOnScrim) close(); });
-  [].forEach.call(document.querySelectorAll('.sh-tab'), function (b) {
-    b.addEventListener('click', function () { tab = b.dataset.tab; render(); });
-  });
-  [].forEach.call(document.querySelectorAll('[data-perm]'), function (b) {
-    b.addEventListener('click', function () { draft.perm = b.dataset.perm; writeForm(); });
-  });
-  ['shAccess', 'shExp', 'shExpDate', 'shPwOn', 'shPw', 'shNoDl'].forEach(function (id) {
-    $(id).addEventListener('input', readForm); $(id).addEventListener('change', readForm);
-  });
-  $('shPwOn').addEventListener('change', function () { if ($('shPwOn').checked) $('shPw').focus(); });
-  $('shCreate').addEventListener('click', startLink);
-  $('shLinkBusyCancel').addEventListener('click', cancelLink);
-  $('shEdit').addEventListener('click', function () { draft = clone(links[api.current().name].settings); writeForm(); st.link = 'form'; render(); focusPane(); });
-  $('shDelete').addEventListener('click', function () {
-    delete links[api.current().name]; draft = defaults(); writeForm(); st.link = 'form'; render();
-    api.toast(['Link deleted. It no longer works.']);
-    focusPane();
-  });
-  $('shCopy').addEventListener('click', function () {
-    var url = $('shUrl').value, btn = $('shCopy');
-    var done = function () { btn.textContent = 'Copied'; live('Link copied.'); setTimeout(function () { btn.textContent = 'Copy link'; }, 1800); };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { $('shUrl').select(); document.execCommand('copy'); done(); });
-    else { $('shUrl').select(); document.execCommand('copy'); done(); }
-  });
   $('shFmt').addEventListener('change', render);
   $('shDlGo').addEventListener('click', startDl);
   $('shDlBusyCancel').addEventListener('click', cancelDl);
-  $('shDlAgain').addEventListener('click', function () { st.dl = 'form'; render(); focusPane(); });
+  $('shDlAgain').addEventListener('click', function () { st = 'form'; render(); focusPane(); });
   $('shDlFile').addEventListener('click', function () {
     var d = api.current(), f = FMT[$('shFmt').value];
     close();
     api.toast(['Download started: ', fileBase(d.name) + f[1]]);
   });
 
-  // Export menu: a file format goes straight to "preparing"; the popup's Share link tab holds the link settings
+  // Export menu: a file format goes straight to "preparing"
   [].forEach.call(document.querySelectorAll('#ovDl [data-fmt]'), function (b) {
-    if (FMT[b.dataset.fmt]) b.addEventListener('click', function () { open('dl', { fmt: b.dataset.fmt, auto: true }); });
+    if (FMT[b.dataset.fmt]) b.addEventListener('click', function () { open({ fmt: b.dataset.fmt, auto: true }); });
   });
 
   // Escape closes the dialog; Tab stays inside it
@@ -2239,6 +2097,67 @@ class Component extends DCLogic {
     if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); close(); return; }
     if (e.key !== 'Tab') return;
     var f = [].filter.call(scrim.querySelectorAll('button, select, input'), function (el) { return !el.disabled && el.offsetParent !== null && el.type !== 'hidden'; });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }, true);
+})();
+
+// Back button: asks to save the project before leaving. Save and Don't save both leave; Cancel, Esc or a click outside stay.
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var api = window.studio;
+  var scrim = $('leaveScrim'), back = $('backBtn'), nameEl = $('wsName'), input = $('lvName');
+  var DEFAULT = 'Untitled project', MAX = 40;
+  var timer = null;
+
+  function open() {
+    var n = api.unsaved();
+    $('lvDesc').textContent = n
+      ? 'You have ' + n + ' unsaved change' + (n > 1 ? 's' : '') + '. Save the project to pick up where you left off, or leave without saving.'
+      : 'Save the project to find it in your workspace later.';
+    input.value = nameEl.textContent.replace(/\s+/g, ' ').trim() || DEFAULT;
+    $('lvSave').disabled = false; $('lvSave').textContent = 'Save project';
+    scrim.hidden = false;
+    input.focus(); input.select();
+  }
+  function close() {
+    clearTimeout(timer);
+    scrim.hidden = true;
+    back.focus();
+  }
+  function leave() {
+    if (history.length > 1) history.back();
+    else close();
+  }
+  function save() {
+    var name = input.value.replace(/\s+/g, ' ').trim().slice(0, MAX) || DEFAULT;
+    $('lvSave').disabled = true; $('lvSave').textContent = 'Saving…';
+    timer = setTimeout(function () {
+      nameEl.textContent = name;
+      nameEl.setAttribute('aria-label', 'Project name: ' + name + '. Double-click or press Enter to rename');
+      if (history.length > 1) history.back();
+      else { close(); api.toast(['Project saved as ', name]); }
+    }, 700);
+  }
+
+  back.addEventListener('click', open);
+  $('lvClose').addEventListener('click', close);
+  $('lvCancel').addEventListener('click', close);
+  $('lvDiscard').addEventListener('click', leave);
+  $('lvSave').addEventListener('click', save);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('lvSave').click(); } });
+  var downOnScrim = false;
+  scrim.addEventListener('mousedown', function (e) { downOnScrim = e.target === scrim; });
+  scrim.addEventListener('click', function (e) { if (e.target === scrim && downOnScrim) close(); });
+
+  // Escape closes the dialog; Tab stays inside it
+  document.addEventListener('keydown', function (e) {
+    if (scrim.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); close(); return; }
+    if (e.key !== 'Tab') return;
+    var f = [].filter.call(scrim.querySelectorAll('button, input'), function (el) { return !el.disabled && el.offsetParent !== null; });
     if (!f.length) return;
     var first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
