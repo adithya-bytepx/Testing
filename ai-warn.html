@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Purge Studio — focused studio</title>
+<title>Data Purge Studio — AI warning</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -3646,6 +3646,31 @@ class Component extends DCLogic {
     loader.classList.add('done');
     setTimeout(function () { loader.remove(); }, 350);
   }, 1000 + Math.round(Math.random() * 1000));
+})();
+
+// ai-warn.html: opens straight on the screen you get when you press Back while the AI is applying a change.
+// It does what a person would do: open the AI tab, send a command, and press Back before the AI is done. The AI is then held mid-run so the screen stays up.
+// Keep waiting (or X, Esc, a click outside) lets the AI finish; Stop and go back cancels it and goes on to "Save your project?", exactly as in ai v1.html.
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var loader = $('pageLoader');
+  if (loader) loader.remove();   // no loading screen: the page opens on the warning
+  var realSet = window.setTimeout, held = null;
+  window.setTimeout = function (f, ms) {   // catch the AI's "apply the change" timer (2 s) once and park it
+    if (!held && ms === 2000) { held = f; window.setTimeout = realSet; return realSet(function () {}, 2147483000); }
+    return realSet.apply(window, arguments);
+  };
+  document.querySelector('[data-group="ai"]').click();
+  var box = $('aiq');
+  box.value = 'remove rows where status is failed';
+  box.dispatchEvent(new Event('input', { bubbles: true }));
+  $('aiForm').requestSubmit();
+  $('backBtn').click();
+  new MutationObserver(function () {   // the warning was closed with the AI still waiting: let it finish
+    if (!$('leaveScrim').hidden || !held || !window.studio.aiBusy()) return;
+    var f = held; held = null;
+    realSet(f, 500);
+  }).observe($('leaveScrim'), { attributes: true, attributeFilter: ['hidden'] });
 })();
 </script></body>
 </html>
