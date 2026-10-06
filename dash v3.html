@@ -649,15 +649,15 @@
     { name: 'Vendor Records Audit',      days: 1 },
   ];
   const FOLDER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
-  // Mini spreadsheet preview; the orange rows stand in for the duplicates a draft still has to resolve
+  // Mini spreadsheet preview; the blue rows stand in for the duplicates a draft still has to resolve
   const sheetThumb = i => {
     const cols = [3, 4, 3, 4][i % 4], hl = [[1, 4], [2, 3], [0, 5], [3]][i % 4], cw = 120 / cols;
     let s = '<svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="28" y="14" width="144" height="130" rx="7" fill="#fff" stroke="#e3e0db"/><rect x="28.5" y="14.5" width="143" height="16" rx="6.5" fill="#f1efeb"/>';
     for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="20" width="${cw * 0.55}" height="4" rx="2" fill="#c4c0b9"/>`;
     for (let r = 0; r < 7; r++) {
       const y = 38 + r * 13, dup = hl.includes(r);
-      if (dup) s += `<rect x="34" y="${y - 4}" width="132" height="12" rx="3" fill="#fdf0e6"/>`;
-      for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="${y}" width="${cw * (0.35 + ((r * 7 + c * 3) % 4) * 0.1)}" height="4" rx="2" fill="${dup ? '#e5772b' : '#d9d6ce'}"/>`;
+      if (dup) s += `<rect x="34" y="${y - 4}" width="132" height="12" rx="3" fill="#e9f2ff"/>`;
+      for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="${y}" width="${cw * (0.35 + ((r * 7 + c * 3) % 4) * 0.1)}" height="4" rx="2" fill="${dup ? '#8fbbf5' : '#d9d6ce'}"/>`;
     }
     return s + '</svg>';
   };

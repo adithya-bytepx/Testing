@@ -51,8 +51,8 @@
   .nav-item:hover { background: var(--active); }
   .nav-item.active { background: var(--active); font-weight: 500; }
   .nav-item .kbd { margin-left: auto; color: var(--faint); font-size: 12px; letter-spacing: 1px; }
-  .nav-item.search { color: var(--muted); }
-  .section-label { font-weight: 600; font-size: 13px; color: var(--muted); padding: 0 7px; margin: 30px 0 8px; }
+  .section-label { display: block; font-weight: 600; font-size: 13px; color: var(--muted); padding: 8px 7px; margin: 22px 0 0; border-radius: 8px; cursor: pointer; }
+  .section-label:hover, .section-label.active { background: var(--active); }
   .link {
     display: flex; align-items: center; gap: 10px;
     height: 34px; padding: 0 7px; border-radius: 8px;
@@ -360,6 +360,44 @@
     h1 { font-size: 24px; margin-top: 56px; }
     .recent { margin-top: 48px; }
   }
+
+  /* My files: saved drafts grid (swaps in for the page content when "My files" is clicked) */
+  .files-view { display: none; width: 100%; padding: 28px 32px 32px; }
+  .main.view-files > :not(.files-view):not(.toast):not(.wizard-overlay) { display: none; }
+  .main.view-files > .files-view { display: block; }
+  .files-view h2 { font-family: var(--heading-font); font-optical-sizing: auto; font-stretch: 100%; font-size: 24px; font-weight: 560; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 20px; }
+  .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .proj-card {
+    display: flex; flex-direction: column; align-items: stretch; text-align: left;
+    background: #fff; border: 1px solid #e3e0db; border-radius: 12px; overflow: hidden;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .proj-card:hover { border-color: #cfcbc4; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .pc-thumb {
+    position: relative; display: block; height: 150px;
+    background-color: #f5f3ef;
+    background-image: radial-gradient(#dcd8d2 1px, transparent 1px); background-size: 14px 14px;
+    border-bottom: 1px solid #ece9e4;
+  }
+  .pc-thumb svg { width: 100%; height: 100%; }
+  .pc-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 2px 8px; border-radius: 999px;
+    background: #fff; border: 1px solid #e3e0db;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+  }
+  .pc-foot { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .pc-foot .proj-ico { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; background: #0077ff; display: grid; place-items: center; }
+  .pc-text { display: block; min-width: 0; }
+  .pc-name { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pc-meta { display: block; margin-top: 2px; font-size: 12px; color: var(--faint); }
+  .pc-meta.soon { color: #b4541a; }
+  .proj-card.new {
+    display: grid; place-items: center; align-content: center; gap: 8px;
+    min-height: 212px; background: transparent;
+    border: 1.5px dashed #c9c5bf; color: var(--muted); font-size: 13px; font-weight: 500;
+  }
+  .proj-card.new:hover { border-color: #0077ff; color: #0077ff; background: #f7faff; box-shadow: none; }
 </style>
 </head>
 <body>
@@ -370,16 +408,12 @@
       <span>Data Purge</span>
     </div>
 
-    <a class="nav-item active" href="#">
+    <a class="nav-item active" id="navHome" href="#">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="#1e1919"><path d="M8 1.2l6.8 5.6v8H10v-4.6H6v4.6H1.2v-8L8 1.2z"/></svg>
       Home
     </a>
-    <a class="nav-item search" href="#">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1e1919" stroke-width="1.4"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4l3.6 3.6" stroke-linecap="round"/></svg>
-      Search
-    </a>
 
-    <div class="section-label">My files</div>
+    <a class="section-label" id="navFiles" href="#">My files</a>
     <a class="link" href="#"><span class="label">Customer List Cleanup</span></a>
     <a class="link" href="#"><span class="label">Q1 Sales Dedupe</span></a>
     <a class="link" href="#"><span class="label">Salesforce Contacts Merge</span></a>
@@ -508,6 +542,11 @@
         <div class="proj-info"><div class="proj-name">Q1 Sales Dedupe</div><div class="proj-meta soon">Expires in 2 days</div></div>
         <button class="open-btn" type="button">Open project</button>
       </div>
+    </section>
+
+    <section class="files-view" id="filesView" aria-label="My files">
+      <h2>My files</h2>
+      <div class="files-grid" id="filesGrid"></div>
     </section>
 
   </main>
@@ -689,9 +728,65 @@
     const b = e.currentTarget; b.disabled = true;
     b.innerHTML = '<span class="spinner"></span><span>Preparing…</span>';
     setTimeout(() => {
-      window.location.href = 'scanning%20screen.html';
+      window.location.href = 'return%20user%202.html';
     }, 1000 + Math.round(Math.random() * 2000));
   });
+
+  // "My files": saved draft projects with their expiry, shown in place of the page content (same as dash v3)
+  (function () {
+    const g = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const PROJECTS = [
+      { name: 'Customer List Cleanup',     days: 5 },
+      { name: 'Q1 Sales Dedupe',           days: 2 },
+      { name: 'Salesforce Contacts Merge', days: 6 },
+      { name: 'Vendor Records Audit',      days: 1 },
+    ];
+    const FOLDER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+    // Mini spreadsheet preview; the blue rows stand in for the duplicates a draft still has to resolve
+    const sheetThumb = i => {
+      const cols = [3, 4, 3, 4][i % 4], hl = [[1, 4], [2, 3], [0, 5], [3]][i % 4], cw = 120 / cols;
+      let s = '<svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="28" y="14" width="144" height="130" rx="7" fill="#fff" stroke="#e3e0db"/><rect x="28.5" y="14.5" width="143" height="16" rx="6.5" fill="#f1efeb"/>';
+      for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="20" width="${cw * 0.55}" height="4" rx="2" fill="#c4c0b9"/>`;
+      for (let r = 0; r < 7; r++) {
+        const y = 38 + r * 13, dup = hl.includes(r);
+        if (dup) s += `<rect x="34" y="${y - 4}" width="132" height="12" rx="3" fill="#e9f2ff"/>`;
+        for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="${y}" width="${cw * (0.35 + ((r * 7 + c * 3) % 4) * 0.1)}" height="4" rx="2" fill="${dup ? '#8fbbf5' : '#d9d6ce'}"/>`;
+      }
+      return s + '</svg>';
+    };
+    const expiry = d => `Expires in ${d} day${d === 1 ? '' : 's'}`;
+
+    const filesGrid = g('filesGrid');
+    filesGrid.innerHTML =
+      `<button class="proj-card new" id="newFile" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Upload a new file
+      </button>` +
+      PROJECTS.map((p, i) => `<button class="proj-card" type="button" data-name="${esc(p.name)}">
+        <span class="pc-thumb">${sheetThumb(i)}<span class="pc-badge">Draft</span></span>
+        <span class="pc-foot">
+          <span class="proj-ico">${FOLDER}</span>
+          <span class="pc-text"><span class="pc-name">${esc(p.name)}</span><span class="pc-meta${p.days <= 2 ? ' soon' : ''}">${expiry(p.days)}</span></span>
+        </span>
+      </button>`).join('');
+
+    const mainEl = document.querySelector('.main'), navHome = g('navHome'), navFiles = g('navFiles');
+    const showView = v => {
+      const isFiles = v === 'files';
+      mainEl.classList.toggle('view-files', isFiles);
+      navHome.classList.toggle('active', !isFiles);
+      navFiles.classList.toggle('active', isFiles);
+      mainEl.scrollTop = 0;
+    };
+    navHome.addEventListener('click', e => { e.preventDefault(); showView('home'); });
+    navFiles.addEventListener('click', e => { e.preventDefault(); showView('files'); });
+    filesGrid.addEventListener('click', e => {
+      const card = e.target.closest('.proj-card'); if (!card) return;
+      if (card.id === 'newFile') showView('home');
+      else toast(`Opening ${card.dataset.name}…`);
+    });
+  })();
 </script>
 </body>
 </html>

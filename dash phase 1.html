@@ -51,8 +51,8 @@
   .nav-item:hover { background: var(--active); }
   .nav-item.active { background: var(--active); font-weight: 500; }
   .nav-item .kbd { margin-left: auto; color: var(--faint); font-size: 12px; letter-spacing: 1px; }
-  .nav-item.search { color: var(--muted); }
-  .section-label { font-weight: 600; font-size: 13px; color: var(--muted); padding: 0 7px; margin: 30px 0 8px; }
+  .section-label { display: block; font-weight: 600; font-size: 13px; color: var(--muted); padding: 8px 7px; margin: 22px 0 0; border-radius: 8px; cursor: pointer; }
+  .section-label:hover, .section-label.active { background: var(--active); }
   .link {
     display: flex; align-items: center; gap: 10px;
     height: 34px; padding: 0 7px; border-radius: 8px;
@@ -362,6 +362,112 @@
     h1 { font-size: 24px; margin-top: 56px; }
     .card { margin-top: 48px; }
   }
+
+  /* My files: saved drafts grid (swaps in for the page content when "My files" is clicked) */
+  .files-view { display: none; width: 100%; padding: 28px 32px 32px; }
+  .main.view-files > :not(.files-view):not(.toast):not(.wizard-overlay) { display: none; }
+  .main.view-files > .files-view { display: block; }
+  .files-view h2 { font-family: var(--heading-font); font-optical-sizing: auto; font-stretch: 100%; font-size: 24px; font-weight: 560; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 20px; }
+  .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .proj-card {
+    display: flex; flex-direction: column; align-items: stretch; text-align: left;
+    background: #fff; border: 1px solid #e3e0db; border-radius: 12px; overflow: hidden;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .proj-card:hover { border-color: #cfcbc4; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .pc-thumb {
+    position: relative; display: block; height: 150px;
+    background-color: #f5f3ef;
+    background-image: radial-gradient(#dcd8d2 1px, transparent 1px); background-size: 14px 14px;
+    border-bottom: 1px solid #ece9e4;
+  }
+  .pc-thumb svg { width: 100%; height: 100%; }
+  .pc-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 2px 8px; border-radius: 999px;
+    background: #fff; border: 1px solid #e3e0db;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+  }
+  .pc-foot { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .pc-foot .proj-ico { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; background: #0077ff; display: grid; place-items: center; }
+  .pc-text { display: block; min-width: 0; }
+  .pc-name { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pc-meta { display: block; margin-top: 2px; font-size: 12px; color: var(--faint); }
+  .pc-meta.soon { color: #b4541a; }
+  .proj-card.new {
+    display: grid; place-items: center; align-content: center; gap: 8px;
+    min-height: 212px; background: transparent;
+    border: 1.5px dashed #c9c5bf; color: var(--muted); font-size: 13px; font-weight: 500;
+  }
+  .proj-card.new:hover { border-color: #0077ff; color: #0077ff; background: #f7faff; box-shadow: none; }
+
+  /* Refer popup: personal invite link + email invite (same as dash-refer); every rule is scoped to #referOverlay */
+  .link.active { background: var(--active); }
+  @keyframes referFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes referRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  #referOverlay {
+    --text: #1e1919; --muted: #52504c; --faint: #8a8784; --active: #ebe8e3;
+    --heading-font: "Bricolage Grotesque", "Archivo", ui-sans-serif, system-ui, sans-serif;
+    position: fixed; inset: 0; z-index: 30;
+    display: grid; place-items: center; padding: 16px;
+    background: rgba(21,23,28,.38);
+    color: var(--text); font-size: 13px;
+    animation: referFade .18s ease;
+  }
+  #referOverlay[hidden] { display: none; }
+  #referOverlay, #referOverlay * { box-sizing: border-box; }
+  #referOverlay h2, #referOverlay p { margin: 0; }
+  #referOverlay svg { display: block; flex-shrink: 0; }
+  #referOverlay button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  #referOverlay .modal {
+    position: relative; width: 460px; max-width: 100%;
+    background: #fff; border-radius: 16px; padding: 28px 28px 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: referRise .22s ease; outline: 0;
+  }
+  #referOverlay .modal h2 { font-family: var(--heading-font); font-optical-sizing: auto; font-stretch: 100%; font-size: 22px; font-weight: 560; letter-spacing: -0.03em; line-height: 1.2; padding-right: 32px; }
+  #referOverlay .modal-sub { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  #referOverlay .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 30px; height: 30px; border-radius: 8px;
+    display: grid; place-items: center; color: #6f6c68;
+  }
+  #referOverlay .modal-close:hover { background: var(--active); color: var(--text); }
+  #referOverlay .field-label { display: block; margin: 22px 0 8px; font-size: 13px; font-weight: 600; }
+  #referOverlay .link-row, #referOverlay .invite-row { display: flex; gap: 8px; }
+  #referOverlay .link-input, #referOverlay .invite-row input {
+    flex: 1; min-width: 0; height: 36px; padding: 0 12px;
+    border: 1px solid #d9d6ce; border-radius: 8px; background: #fff;
+    font: inherit; font-size: 13.5px; color: var(--text); outline: 0;
+  }
+  #referOverlay .link-input { background: #f5f3ef; color: var(--muted); text-overflow: ellipsis; }
+  #referOverlay .link-input:focus, #referOverlay .invite-row input:focus { border-color: #0077ff; box-shadow: 0 0 0 3px rgba(0,119,255,0.15); }
+  #referOverlay .invite-row input.err { border-color: #c4321a; box-shadow: 0 0 0 3px rgba(196,50,26,0.12); }
+  #referOverlay .copy-btn {
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    height: 36px; padding: 0 14px; border-radius: 8px;
+    border: 1px solid #d9d6ce; background: #fff;
+    font-size: 14px; font-weight: 500; white-space: nowrap;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  #referOverlay .copy-btn:hover { background: #faf9f6; }
+  #referOverlay .copy-btn .ok-ic, #referOverlay .copy-btn.done .copy-ic { display: none; }
+  #referOverlay .copy-btn.done .ok-ic { display: block; }
+  #referOverlay .copy-btn.done { color: #1f8a4c; border-color: #bfe3cc; background: #f2faf5; }
+  #referOverlay .modal-divider { height: 1px; background: #ebe8e3; margin-top: 22px; }
+  #referOverlay .invite-msg { min-height: 18px; margin-top: 8px; font-size: 12.5px; color: var(--faint); }
+  #referOverlay .invite-msg.err { color: #c4321a; }
+  #referOverlay .invite-msg.ok { color: #1f8a4c; }
+  #referOverlay .primary-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #0077ff; color: #fff;
+    height: 36px; padding: 0 14px; border-radius: 8px;
+    font-size: 14px; font-weight: 500;
+    border: none; cursor: pointer;
+    transition: filter .15s ease;
+  }
+  #referOverlay .primary-btn { box-shadow: none; }
+  #referOverlay .primary-btn:hover:not(:disabled) { background: #0077ff; filter: brightness(1.1); }
 </style>
 </head>
 <body>
@@ -372,25 +478,21 @@
       <span>Data Purge</span>
     </div>
 
-    <a class="nav-item active" href="#">
+    <a class="nav-item active" id="navHome" href="#">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="#1e1919"><path d="M8 1.2l6.8 5.6v8H10v-4.6H6v4.6H1.2v-8L8 1.2z"/></svg>
       Home
     </a>
-    <a class="nav-item search" href="#">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1e1919" stroke-width="1.4"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4l3.6 3.6" stroke-linecap="round"/></svg>
-      Search
-    </a>
 
-    <div class="section-label">My files</div>
+    <a class="section-label" id="navFiles" href="#">My files</a>
     <a class="link" href="#"><span class="label">Latest Campaign Docs</span></a>
     <a class="link" href="#"><span class="label">Q1 Overview Summary</span></a>
     <a class="link" href="#"><span class="label">Connected Apps Demo</span></a>
     <a class="link" href="#"><span class="label">About Data Purge</span></a>
 
     <div class="sidebar-bottom"><!-- pinned to bottom -->
-      <a class="link" href="#">
+      <a class="link" id="navRefer" href="#" aria-haspopup="dialog">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1e1919" stroke-width="1.3" stroke-linecap="round"><circle cx="6.5" cy="5" r="2.8"/><path d="M1.5 14c0-2.8 2.2-4.6 5-4.6 1.1 0 2 .2 2.8.7"/><path d="M12.5 9.5v5M10 12h5"/></svg>
-        Invite people
+        Refer
       </a>
       <a class="link" href="#">
         <span class="avatar">SL</span>
@@ -519,8 +621,44 @@
         <span class="text">Dataset detection</span>      </div>
     </section>
 
+    <section class="files-view" id="filesView" aria-label="My files">
+      <h2>My files</h2>
+      <div class="files-grid" id="filesGrid"></div>
+    </section>
+
   </main>
 </div>
+<div class="modal-overlay" id="referOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="referTitle" tabindex="-1">
+    <button class="modal-close" id="referClose" type="button" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+    </button>
+    <h2 id="referTitle">Refer a friend</h2>
+    <p class="modal-sub">Invite someone to Data Purge with your personal link, or send them an invite by email.</p>
+
+    <label class="field-label" for="referLink">Personal link</label>
+    <div class="link-row">
+      <input class="link-input" id="referLink" type="text" readonly>
+      <button class="copy-btn" id="copyLink" type="button">
+        <svg class="copy-ic" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"/><path d="M10.5 5.5V4a1.8 1.8 0 0 0-1.8-1.8H4A1.8 1.8 0 0 0 2.2 4v4.7A1.8 1.8 0 0 0 4 10.5h1.5"/></svg>
+        <svg class="ok-ic" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.4l3 3 6-6.8"/></svg>
+        <span id="copyLabel">Copy link</span>
+      </button>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <form id="inviteForm" novalidate>
+      <label class="field-label" for="inviteEmail">Send as email invite</label>
+      <div class="invite-row">
+        <input id="inviteEmail" type="email" placeholder="name@company.com" autocomplete="off">
+        <button class="primary-btn" type="submit">Invite</button>
+      </div>
+      <p class="invite-msg" id="inviteMsg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
 <script>
   const $ = id => document.getElementById(id);
   const dz = $('dropzone'), sel = $('selection'), list = $('fileList');
@@ -708,6 +846,133 @@
       window.location.href = 'scanning%20screen.html';
     }, 1000 + Math.round(Math.random() * 2000));
   });
+
+  // "My files": saved draft projects with their expiry, shown in place of the page content (same as dash v3)
+  (function () {
+    const g = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const PROJECTS = [
+      { name: 'Customer List Cleanup',     days: 5 },
+      { name: 'Q1 Sales Dedupe',           days: 2 },
+      { name: 'Salesforce Contacts Merge', days: 6 },
+      { name: 'Vendor Records Audit',      days: 1 },
+    ];
+    const FOLDER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+    // Mini spreadsheet preview; the blue rows stand in for the duplicates a draft still has to resolve
+    const sheetThumb = i => {
+      const cols = [3, 4, 3, 4][i % 4], hl = [[1, 4], [2, 3], [0, 5], [3]][i % 4], cw = 120 / cols;
+      let s = '<svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="28" y="14" width="144" height="130" rx="7" fill="#fff" stroke="#e3e0db"/><rect x="28.5" y="14.5" width="143" height="16" rx="6.5" fill="#f1efeb"/>';
+      for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="20" width="${cw * 0.55}" height="4" rx="2" fill="#c4c0b9"/>`;
+      for (let r = 0; r < 7; r++) {
+        const y = 38 + r * 13, dup = hl.includes(r);
+        if (dup) s += `<rect x="34" y="${y - 4}" width="132" height="12" rx="3" fill="#e9f2ff"/>`;
+        for (let c = 0; c < cols; c++) s += `<rect x="${40 + c * cw}" y="${y}" width="${cw * (0.35 + ((r * 7 + c * 3) % 4) * 0.1)}" height="4" rx="2" fill="${dup ? '#8fbbf5' : '#d9d6ce'}"/>`;
+      }
+      return s + '</svg>';
+    };
+    const expiry = d => `Expires in ${d} day${d === 1 ? '' : 's'}`;
+
+    const filesGrid = g('filesGrid');
+    filesGrid.innerHTML =
+      `<button class="proj-card new" id="newFile" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Upload a new file
+      </button>` +
+      PROJECTS.map((p, i) => `<button class="proj-card" type="button" data-name="${esc(p.name)}">
+        <span class="pc-thumb">${sheetThumb(i)}<span class="pc-badge">Draft</span></span>
+        <span class="pc-foot">
+          <span class="proj-ico">${FOLDER}</span>
+          <span class="pc-text"><span class="pc-name">${esc(p.name)}</span><span class="pc-meta${p.days <= 2 ? ' soon' : ''}">${expiry(p.days)}</span></span>
+        </span>
+      </button>`).join('');
+
+    const mainEl = document.querySelector('.main'), navHome = g('navHome'), navFiles = g('navFiles');
+    const showView = v => {
+      const isFiles = v === 'files';
+      mainEl.classList.toggle('view-files', isFiles);
+      navHome.classList.toggle('active', !isFiles);
+      navFiles.classList.toggle('active', isFiles);
+      mainEl.scrollTop = 0;
+    };
+    navHome.addEventListener('click', e => { e.preventDefault(); showView('home'); });
+    navFiles.addEventListener('click', e => { e.preventDefault(); showView('files'); });
+    filesGrid.addEventListener('click', e => {
+      const card = e.target.closest('.proj-card'); if (!card) return;
+      if (card.id === 'newFile') showView('home');
+      else toast(`Opening ${card.dataset.name}…`);
+    });
+  })();
+
+  // Refer: popup with a personal invite link and an email invite (the email send is simulated); same as dash-refer
+  (function () {
+    const g = id => document.getElementById(id);
+    const REFER_LINK = 'https://datapurge.app/r/sl-2avaro';
+    const navRefer = g('navRefer'), referOverlay = g('referOverlay'), referLink = g('referLink');
+    const copyBtn = g('copyLink'), copyLabel = g('copyLabel');
+    const inviteForm = g('inviteForm'), inviteEmail = g('inviteEmail'), inviteMsg = g('inviteMsg');
+    referLink.value = REFER_LINK;
+
+    const setInviteMsg = (text, kind = '') => { inviteMsg.textContent = text; inviteMsg.className = 'invite-msg' + (kind ? ' ' + kind : ''); };
+    const resetCopy = () => { clearTimeout(copyBtn.t); copyBtn.classList.remove('done'); copyLabel.textContent = 'Copy link'; };
+    const openRefer = () => {
+      setInviteMsg(''); inviteEmail.value = ''; inviteEmail.classList.remove('err'); resetCopy();
+      referOverlay.hidden = false; navRefer.classList.add('active');
+      referOverlay.querySelector('.modal').focus();
+    };
+    const closeRefer = () => {
+      if (referOverlay.hidden) return;
+      referOverlay.hidden = true; navRefer.classList.remove('active'); navRefer.focus();
+    };
+    navRefer.addEventListener('click', e => { e.preventDefault(); openRefer(); });
+    g('referClose').addEventListener('click', closeRefer);
+    referOverlay.addEventListener('click', e => { if (e.target === referOverlay) closeRefer(); });
+    document.addEventListener('keydown', e => {
+      if (referOverlay.hidden) return;
+      if (e.key === 'Escape') { closeRefer(); return; }
+      if (e.key !== 'Tab') return;
+      // keep Tab inside the popup
+      const f = [...referOverlay.querySelectorAll('button, input')];
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === referOverlay.querySelector('.modal'))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    // Copy link: clipboard API first, then the old execCommand route; if both fail the field is selected for Ctrl+C
+    const copyText = async t => {
+      try { await navigator.clipboard.writeText(t); return true; } catch {}
+      referLink.select();
+      try { return document.execCommand('copy'); } catch { return false; }
+    };
+    referLink.addEventListener('focus', () => referLink.select());
+    copyBtn.addEventListener('click', async () => {
+      resetCopy();
+      if (await copyText(REFER_LINK)) {
+        if (document.activeElement === referLink) copyBtn.focus();
+        getSelection().removeAllRanges();
+        copyBtn.classList.add('done'); copyLabel.textContent = 'Copied';
+        copyBtn.t = setTimeout(resetCopy, 2000);
+      } else {
+        referLink.focus(); copyLabel.textContent = 'Press Ctrl+C';
+        copyBtn.t = setTimeout(resetCopy, 2500);
+      }
+    });
+
+    inviteForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = inviteEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+        inviteEmail.classList.add('err'); inviteEmail.focus();
+        setInviteMsg(v ? 'Enter a valid email address.' : 'Enter an email address to send an invite.', 'err');
+        return;
+      }
+      inviteEmail.classList.remove('err'); inviteEmail.value = '';
+      setInviteMsg(`Invite sent to ${v}`, 'ok');
+    });
+    inviteEmail.addEventListener('input', () => {
+      inviteEmail.classList.remove('err');
+      if (inviteMsg.classList.contains('err')) setInviteMsg('');
+    });
+  })();
 </script>
 </body>
 </html>

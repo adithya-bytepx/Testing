@@ -710,6 +710,13 @@ class Component extends DCLogic {
   #syncBanner .hp-code { font-family: 'Geist Mono', monospace; font-size: 12px; padding: 0 4px; border-radius: 4px; background: rgba(0,119,255,.1); }
   #syncBanner .link { border: 0; background: transparent; padding: 0 2px; font: inherit; font-weight: 500; color: #0077FF; cursor: pointer; }
   #syncBanner .link:hover { text-decoration: underline; }
+  #syncBanner .sb-head.ask { align-items: center; }
+  #syncBanner .sb-head > .sb-actions { flex: none; display: flex; gap: 8px; margin: -4px 0; }
+  #syncBanner .sb-btn { height: 28px; padding: 0 12px; border-radius: 8px; border: 1px solid #D9D6CE; background: #FFFFFF; color: #15171C; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+  #syncBanner .sb-btn:hover { background: #FAF9F6; }
+  #syncBanner .sb-btn.primary { border-color: #0077FF; background: #0077FF; color: #FFFFFF; }
+  #syncBanner .sb-btn.primary:hover { border-color: #0060D6; background: #0060D6; }
+  #syncBanner .sb-btn:focus-visible { outline: 2px solid #0077FF; outline-offset: 2px; }
   .ds-sync { width: 8px; height: 8px; flex-shrink: 0; border-radius: 4px; background: #0077FF; box-shadow: 0 0 0 2px #CCE4FF; }
   .ds-sync.warn { background: #B4530A; box-shadow: 0 0 0 2px #F3D9B8; }
   .chip-src { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border-radius: 6px; font: inherit; font-size: 12px; font-weight: 500; border: 1px solid; cursor: pointer; }
@@ -1391,7 +1398,7 @@ class Component extends DCLogic {
       t.innerHTML = '<button class="ds-main"><span class="ds-badge" style="background:' + d.badge[1] + ';color:' + d.badge[2] + '">' + esc(d.badge[0]) + '</span><span class="ds-name">' + esc(d.name) + '</span>' +
         (d.changes ? '<span class="ds-dirty" aria-label="Unsaved changes"></span>' : '') +
         (d.kind === 'combined' && d.broken ? '<span class="ds-sync warn" title="Not updated: a match column is gone" aria-label="Not updated: a match column is gone"></span>'
-          : d.kind === 'combined' && d.sync && d.sync.length ? '<span class="ds-sync" title="Updated from its source datasets" aria-label="Updated from its source datasets"></span>' : '') + '</button>' +
+          : d.kind === 'combined' && d.pending && d.pending.length ? '<span class="ds-sync" title="Source datasets changed: waiting for you to sync" aria-label="Source datasets changed: waiting for you to sync"></span>' : '') + '</button>' +
         '<button class="ds-x" aria-label="Close ' + esc(d.name) + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5B5E66" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
       nav.insertBefore(t, $('addBtn'));
     });
@@ -1820,7 +1827,7 @@ class Component extends DCLogic {
         opItem('editMatch', merge ? 'Edit match' : 'Edit append', merge ? 'Keys and which rows to keep' : 'Change sources or mode', P.edit, '#0077FF', '#E6F1FF') +
         (merge ? opItem('unmatched', 'Review unmatched rows', unmatchedCount(d) ? 'Rows with no match in the other source' : 'Every row matched', P.filter, '#B4530A', '#FDF1E3', unmatchedCount(d), !unmatchedCount(d)) : '') +
         (merge ? opItem('resolve', 'Resolve overlapping columns', ov ? 'Columns that hold the same kind of value' : 'No overlaps found', P.resolve, '#1E6FA8', '#E3F1FB', ov, !ov) : '') +
-        opItem('refresh', 'Refresh from sources', 'Up to date', P.refresh, '#1D6B3A', '#E3F2E8', 0, true) +
+        opItem('refresh', 'Refresh from sources', waiting(d) ? waiting(d) + ' change' + (waiting(d) === 1 ? '' : 's') + ' from the sources not applied yet' : 'Up to date', P.refresh, '#1D6B3A', '#E3F2E8', waiting(d), !waiting(d)) +
         (merge ? opItem('pickCols', 'Choose source columns', 'What comes in from ' + rname, P.pick, '#3C3F46', '#ECEAE4') : '');
     }
     $('opList').className = 'op-list' + (g === 'ai' ? ' ai' : '');
@@ -1855,21 +1862,28 @@ class Component extends DCLogic {
     var d = DS[active];
     renderTabs(); renderFileBar(d); renderLineage(d); renderSyncBanner(d); renderHistory(d); renderData(d); renderOps(d);
   }
-  // On a merged tab: what changed in its source datasets since you last looked, and a warning when a source change broke the match
+  // On a merged tab: source changes waiting for Sync / Cancel, what a Sync applied, and a warning when a source change broke the match
   function renderSyncBanner(d) {
-    var box = $('syncBanner'), n = d.kind === 'combined' && d.notice ? d.notice : [], broken = d.kind === 'combined' ? d.broken : null;
-    if (!n.length && !broken) { box.hidden = true; box.innerHTML = ''; return; }
+    var box = $('syncBanner'), comb = d.kind === 'combined';
+    var n = comb && d.notice ? d.notice : [], p = comb && d.pending && d.pending.length ? (d.skipped || []).concat(d.pending) : [], broken = comb ? d.broken : null;
+    if (!n.length && !p.length && !broken) { box.hidden = true; box.innerHTML = ''; return; }
     var icon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="' + P.refresh + '"/></svg>';
     var h = '';
     if (broken) h += '<div class="sb-warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span><b>Not updated.</b> ' + esc(broken) + ' This tab still shows the data from before that change. <button class="link" data-edit>Edit merge</button> to pick another match column.</span></div>';
-    if (n.length) {
+    if (p.length) {   // changes made in a source dataset wait here until the user chooses Sync or Cancel
+      var waiting = p.slice(0, 6).map(function (ev) { return '<li><b>' + esc(ev.src) + '</b> · ' + ev.text + '</li>'; });
+      h += '<div class="sb-head ask">' + icon + '<span><b>Source datasets changed</b> · ' + p.length + ' change' + (p.length === 1 ? '' : 's') + ' waiting. Sync ' + (p.length === 1 ? 'it' : 'them') + ' into this dataset?</span>' +
+        '<span class="sb-actions"><button class="sb-btn" data-sb="cancel">Cancel</button><button class="sb-btn primary" data-sb="sync">Sync</button></span></div>' +
+        '<ul class="sb-list">' + waiting.join('') + (p.length > 6 ? '<li class="sb-more">and ' + (p.length - 6) + ' more</li>' : '') + '</ul>';
+    }
+    if (n.length) {   // after Sync: what was applied
       var lines = [];
       n.forEach(function (ev) {
         lines.push('<li><b>' + esc(ev.src) + '</b> · ' + ev.text + '</li>');
         ev.skipped.forEach(function (l) { lines.push('<li class="sb-skip">Couldn’t repeat your change here, its column is gone: ' + l + '</li>'); });
       });
       var more = lines.length > 6 ? lines.length - 6 : 0;
-      h += '<div class="sb-head">' + icon + '<span><b>Updated from its source datasets</b> · ' + n.length + ' change' + (n.length === 1 ? '' : 's') + ' applied since you last opened this tab</span><button class="link" data-sb="dismiss">Dismiss</button></div>' +
+      h += '<div class="sb-head">' + icon + '<span><b>Synced from its source datasets</b> · ' + n.length + ' change' + (n.length === 1 ? '' : 's') + ' applied</span><button class="link" data-sb="dismiss">Dismiss</button></div>' +
         '<ul class="sb-list">' + lines.slice(0, 6).join('') + (more ? '<li class="sb-more">and ' + more + ' more in the version history</li>' : '') + '</ul>';
     }
     box.innerHTML = h; box.hidden = false;
@@ -1975,30 +1989,56 @@ class Component extends DCLogic {
     (d.ops || []).forEach(function (o) { if (!OPS[o.type](d, o)) skipped.push(o.label); });   // an operation whose column is gone cannot be repeated
     return skipped;
   }
-  function syncDependents(src, text) {   // a source changed: bring every merged tab built from it up to date and note what happened there
+  function syncDependents(src, text) {   // a source changed: each merged tab built from it now has a change waiting; nothing is applied until the user chooses Sync
     var hit = [];
     order.forEach(function (id) {
       var c = DS[id], s = c.spec;
       if (c.kind !== 'combined' || (s.leftId !== src.id && s.rightId !== src.id)) return;
-      var L = DS[s.leftId], R = DS[s.rightId], broken = null, skipped = [];
-      if (s.mode === 'merge') {
-        if (L.cols.indexOf(s.lk) < 0) broken = 'The match column ' + s.lk + ' is no longer in ' + L.name + '.';
-        else if (R.cols.indexOf(s.rk) < 0) broken = 'The match column ' + s.rk + ' is no longer in ' + R.name + '.';
-      }
-      c.broken = broken;
-      if (!broken) skipped = rebuild(c);
-      c.sync = (c.sync || []).concat({ src: src.name, text: text, skipped: skipped, broken: broken });   // shown the next time the tab is opened
-      c.log = [['Synced from ' + esc(src.name) + ': ' + text, stamp()]].concat(c.log);
+      (c.pending = c.pending || []).push({ src: src.name, text: text });
       hit.push(c);
     });
     return hit;
   }
-  function withSync(parts, hit) {   // toast text: say which merged tabs were updated too
+  function waiting(d) { return (d.pending ? d.pending.length : 0) + (d.skipped ? d.skipped.length : 0); }   // source changes this merged tab has not applied yet
+  function absorbPending(d) {   // a rebuild reads the sources as they are now, so the changes that were waiting or skipped are part of it
+    var p = (d.skipped || []).concat(d.pending || []);
+    p.forEach(function (ev) { d.log = [['Synced from ' + esc(ev.src) + ': ' + ev.text, stamp()]].concat(d.log); });
+    d.pending = []; d.skipped = [];
+    return p.length;
+  }
+  function pickedUp(n) { return n ? ' It also picked up ' + n + ' change' + (n === 1 ? '' : 's') + ' from the source datasets.' : ''; }
+  function syncNow(c) {   // Sync (or Refresh from sources): bring this merged tab up to date with its sources, then say what changed
+    var p = (c.skipped || []).concat(c.pending || []);
+    if (!p.length) return;
+    var s = c.spec, L = DS[s.leftId], R = DS[s.rightId], broken = null, skipped = [];
+    if (s.mode === 'merge') {
+      if (L.cols.indexOf(s.lk) < 0) broken = 'The match column ' + s.lk + ' is no longer in ' + L.name + '.';
+      else if (R.cols.indexOf(s.rk) < 0) broken = 'The match column ' + s.rk + ' is no longer in ' + R.name + '.';
+    }
+    c.broken = broken;
+    if (!broken) skipped = rebuild(c);
+    c.pending = []; c.skipped = [];
+    c.notice = p.map(function (ev, i) { return { src: ev.src, text: ev.text, skipped: i ? [] : skipped, broken: broken }; });   // listed above the table
+    p.forEach(function (ev) { c.log = [[(broken ? 'Couldn’t sync from ' : 'Synced from ') + esc(ev.src) + ': ' + ev.text, stamp()]].concat(c.log); });
+    renderAll();
+    toast(broken ? ['Couldn’t sync ', c.name, ': a match column is gone.']
+                 : ['Synced ' + p.length + ' change' + (p.length === 1 ? '' : 's') + ' from the source datasets into ', c.name, '. Details are above the table.']);
+    var tab = document.querySelector('.ds-tab[aria-current="true"] .ds-main'); if (tab) tab.focus();
+  }
+  function cancelSync(c) {   // Cancel: leave this merged tab as it is; the changes stay available under "Refresh from sources"
+    var p = c.pending || [];
+    if (!p.length) return;
+    p.forEach(function (ev) { c.log = [['Sync skipped for ' + esc(ev.src) + ': ' + ev.text, stamp()]].concat(c.log); });
+    c.skipped = (c.skipped || []).concat(p); c.pending = [];
+    renderAll();
+    toast(['Sync cancelled. ', c.name, ' keeps its current data.']);
+    var tab = document.querySelector('.ds-tab[aria-current="true"] .ds-main'); if (tab) tab.focus();
+  }
+  function withSync(parts, hit) {   // toast text: say which merged tabs now have a change waiting
     if (!hit.length) return parts;
-    var ok = hit.filter(function (c) { return !c.broken; }), bad = hit.filter(function (c) { return c.broken; }), p = parts.slice();
-    if (ok.length === 1) { p[p.length - 1] += ' Also updated '; p.push(ok[0].name, '.'); }
-    else if (ok.length) p[p.length - 1] += ' Also updated ' + ok.length + ' merged datasets.';
-    if (bad.length) p[p.length - 1] += ' ' + (bad.length === 1 ? bad[0].name : bad.length + ' merged datasets') + ' could not be updated: a match column is gone.';
+    var p = parts.slice();
+    if (hit.length === 1) { p[p.length - 1] += ' '; p.push(hit[0].name, ' has a change waiting to sync.'); }
+    else p[p.length - 1] += ' ' + hit.length + ' merged datasets have changes waiting to sync.';
     return p;
   }
   function runOp(d, o, what) {   // apply an operation to a dataset, record it, and carry it over to the merged tabs built from it
@@ -2799,10 +2839,9 @@ class Component extends DCLogic {
   function activate(id) {
     if (DS[active]) DS[active].notice = null;   // the notice about synced changes is shown once, while you are on the tab
     active = id; op = null; scope = 'col'; search = ''; unmatchedOnly = false; rs = { choice: 'fill', pair: 0 }; pick = null; selRows.clear(); rmCols = []; aiq = ''; aiShimmer(false);
-    var d = DS[id], n = d.sync ? d.sync.length : 0;
-    d.notice = n ? d.sync : null; d.sync = [];
+    var d = DS[id], n = d.pending ? d.pending.length : 0;
     renderAll();
-    if (n) toast(['Updated from its source datasets: ' + n + ' change' + (n === 1 ? '' : 's') + ' applied. Details are above the table.']);
+    if (n) toast(['Source datasets changed: ' + n + ' change' + (n === 1 ? '' : 's') + ' waiting. Choose Sync or Cancel above the table.']);
   }
   var toastTimer, toastFn = null;
   function toast(parts, action) {   // parts: plain text, or [text] / [text, 'mono-name', text]; action: ['Undo', fn] adds a button
@@ -2913,8 +2952,9 @@ class Component extends DCLogic {
       d = DS[editing];
       spec.rightCols = merge && d.spec.rightId === spec.rightId ? d.spec.rightCols : null;
       d.spec = spec; d.name = nm; d.broken = null; rebuild(d);   // the changes made in this tab are re-applied on top of the new settings
+      var got = absorbPending(d);
       d.log.unshift([merge ? 'Edited merge settings' : 'Edited append settings', stamp()]);
-      toast([(merge ? 'Merged' : 'Appended') + ' dataset updated.']);
+      toast([(merge ? 'Merged' : 'Appended') + ' dataset updated.' + pickedUp(got)]);
     } else {
       d = { id: 'c' + (++seq), kind: 'combined', name: nm, badge: ['⇄', '#E6F1FF', '#0077FF'], spec: spec, changes: 0,
         log: [[(merge ? 'Merged ' : 'Appended ') + esc(L.name) + ' + ' + esc(R.name), stamp()]] };
@@ -3120,7 +3160,7 @@ class Component extends DCLogic {
     var b = document.querySelector('#opList [data-op="extractFrom"]'); if (b) b.focus();
   }
   function undoExtract() {   // Undo, for any dataset (the name is from when it only undid extracts)
-    var d = DS[active], what, hit = [];
+    var d = DS[active], what, hit = [], got = 0;
     if (d.kind === 'combined') {   // a merged tab: drop its last operation and rebuild from the sources
       var o = d.ops && d.ops.pop();
       if (!o) return;
@@ -3129,7 +3169,7 @@ class Component extends DCLogic {
       d.log.forEach(function (l, i) { if (at < 0 && l[2] === o) at = i; });
       if (at > -1) d.log = d.log.slice(0, at).concat(d.log.slice(at + 1));
       d.changes = Math.max(0, d.changes - 1);
-      rebuild(d);
+      rebuild(d); got = absorbPending(d);
     } else {
       var s = d.undo && d.undo.pop();
       if (!s) return;
@@ -3140,7 +3180,7 @@ class Component extends DCLogic {
     }
     selRows.clear();
     renderAll();
-    toast(withSync(['Undid ' + what + '.'], hit));
+    toast(withSync(['Undid ' + what + '.' + pickedUp(got)], hit));
   }
   $('undoBtn').addEventListener('click', undoExtract);
   $('exClose').addEventListener('click', closeExtract);
@@ -3294,6 +3334,8 @@ class Component extends DCLogic {
   });
   $('syncBanner').addEventListener('click', function (e) {
     if (e.target.closest('[data-edit]')) openDialog(null, active);
+    else if (e.target.closest('[data-sb="sync"]')) syncNow(DS[active]);
+    else if (e.target.closest('[data-sb="cancel"]')) cancelSync(DS[active]);
     else if (e.target.closest('[data-sb="dismiss"]')) { DS[active].notice = null; renderSyncBanner(DS[active]); }
   });
   $('showAll').addEventListener('click', function () { unmatchedOnly = false; renderData(DS[active]); });
@@ -3345,6 +3387,7 @@ class Component extends DCLogic {
     if (k === 'extractFrom') openExtract();
     else if (k === 'addCol') openAddCol();
     else if (k === 'editMatch') openDialog(null, active);
+    else if (k === 'refresh') syncNow(DS[active]);
     else if (k === 'unmatched') { unmatchedOnly = true; renderData(d); }
     else show(k);
   });

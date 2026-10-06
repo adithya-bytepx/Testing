@@ -353,38 +353,37 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  .card {
-    width: 633px; max-width: calc(100% - 32px);
-    margin-top: 48px; margin-bottom: 28px;
-    border: 1px solid #dcd8d2;
-    border-radius: 10px;
-    padding: 0 16px 8px;
+  /* Recent projects */
+  .recent { width: 633px; max-width: calc(100% - 32px); margin-top: 48px; margin-bottom: 28px; }
+  .recent h2 { font-family: var(--heading-font); font-optical-sizing: auto; font-stretch: 100%; font-size: 15px; font-weight: 560; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .proj {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin-bottom: 8px;
+    background: #fff; border: 1px solid #e3e0db; border-radius: 12px;
   }
-  .card-head { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 2px; }
-  .card-head h2 { font-family: var(--heading-font); font-optical-sizing: auto; font-stretch: 100%; font-size: 15px; font-weight: 560; letter-spacing: -0.02em; }
-  .badge {
-    margin-left: auto; display: flex; align-items: center; gap: 4px;
-    border: 1px solid #e3e0db; border-radius: 6px;
-    padding: 2px 6px; font-size: 11px; font-weight: 500; white-space: nowrap;
+  .proj:hover { border-color: #cfcbc4; }
+  .proj-ico {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: #0077ff; display: grid; place-items: center;
   }
-  .task {
-    display: flex; align-items: center; gap: 11px;
-    height: 49.5px; border-top: 1px solid #ebe8e3;
-    font-size: 13px; cursor: pointer;
+  .proj-info { min-width: 0; }
+  .proj-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proj-meta { margin-top: 2px; font-size: 12px; color: var(--faint); }
+  .proj-meta.soon { color: #b4541a; }
+  .open-btn {
+    margin-left: auto; flex-shrink: 0;
+    height: 30px; padding: 0 12px; border-radius: 8px;
+    border: 1px solid #dcd8d2; background: #fff;
+    font-size: 12.5px; font-weight: 500; white-space: nowrap;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
   }
-  .task .circle {
-    width: 26px; height: 26px; border-radius: 50%;
-    border: 1px solid #b9b5af;
-    display: grid; place-items: center;
-  }
-  .task.done .circle { background: #f2f0ec; border-color: #c9c5bf; }
-  .task.done .text { text-decoration: line-through; color: var(--muted); }
+  .open-btn:hover { background: #0077ff; border-color: #0077ff; color: #fff; }
 
   @media (max-width: 760px) {
     .sidebar { display: none; }
     .main { margin: 6px; }
     h1 { font-size: 24px; margin-top: 56px; }
-    .card { margin-top: 48px; }
+    .recent { margin-top: 48px; }
   }
 
   /* My files: saved drafts grid (swaps in for the page content when "My files" is clicked) */
@@ -576,27 +575,17 @@
     </section>
 
     <div class="toast" id="toast" role="status"></div>
-    <section class="card">
-      <div class="card-head">
-        <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#1e1919" stroke-width="1.3" stroke-linejoin="round"><path d="M14.5 1.5c-4 0-7 2.5-8.6 6.4l2.2 2.2C12 8.5 14.5 5.5 14.5 1.5z"/><circle cx="10.6" cy="5.4" r="1"/><path d="M5.9 7.9H3L1.5 9.6l3 .4M8.1 10.1V13l-1.7 1.5-.4-3"/><path d="M3.8 12.2l-2.3 2.3" stroke-linecap="round"/></svg>
-        <h2>Get started with Data Purge</h2>
-        <span class="badge">
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#1e1919" stroke-width="1.1"><circle cx="6" cy="6" r="4.8"/><path d="M3.8 6.1l1.5 1.4 2.9-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span id="progress">2</span> of 3
-        </span>
+    <section class="recent">
+      <h2>Recent projects</h2>
+      <div class="proj">
+        <span class="proj-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+        <div class="proj-info"><div class="proj-name">Customer List Cleanup</div><div class="proj-meta">Expires in 5 days</div></div>
+        <button class="open-btn" type="button">Open project</button>
       </div>
-
-      <div class="task done">
-        <span class="circle"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#52504c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.3 4.6-5"/></svg></span>
-        <span class="text">Account creation</span>
-      </div>
-      <div class="task done">
-        <span class="circle"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#52504c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.4 2.3 4.6-5"/></svg></span>
-        <span class="text">File upload</span>
-      </div>
-      <div class="task" id="taskDetect">
-        <span class="circle"></span>
-        <span class="text">Dataset detection</span>
+      <div class="proj">
+        <span class="proj-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+        <div class="proj-info"><div class="proj-name">Q1 Sales Dedupe</div><div class="proj-meta soon">Expires in 2 days</div></div>
+        <button class="open-btn" type="button">Open project</button>
       </div>
     </section>
     <section class="files-view" id="filesView" aria-label="My files">
@@ -675,6 +664,10 @@
     clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400);
   }
 
+  // Recent projects: the demo only shows a toast
+  document.querySelectorAll('.open-btn').forEach(b => b.addEventListener('click', () =>
+    toast(`Opening ${b.closest('.proj').querySelector('.proj-name').textContent}…`)));
+
   function renderList() {
     list.hidden = files.length < 2;
     list.innerHTML = files.map((f, i) => {
@@ -698,14 +691,6 @@
     $('curSubText').textContent = files.length > 1 ? `File ${i + 1} of ${files.length}` : 'Scanning for sensitive data';
   }
 
-  // "Detection" onboarding task: ticked and struck out once every file is detected
-  function setDetectTask(done) {
-    const task = $('taskDetect');
-    task.classList.toggle('done', done);
-    task.querySelector('.circle').innerHTML = done ? CHECK_SVG.replace('width="11" height="11"', 'width="10" height="10"').replace('stroke-width="1.6"', 'stroke-width="1.4"').replace('stroke="currentColor"', 'stroke="#52504c"') : '';
-    $('progress').textContent = done ? 3 : 2;
-  }
-
   function finish() {
     $('scanStatus').classList.add('done');
     $('scanStatus').innerHTML = CHECK_SVG.replace('width="11" height="11"', 'width="12" height="12"') + '<span>Detected</span>';
@@ -717,7 +702,6 @@
     $('curSub').classList.add('done');
     $('curSubText').textContent = 'Ready to review';
     $('singleEditor').disabled = false;
-    setDetectTask(true);
   }
 
   function start() {
@@ -732,7 +716,6 @@
     $('curLabel').textContent = 'Current file';
     $('curSub').classList.remove('done');
     $('singleEditor').disabled = true;
-    setDetectTask(false);
 
     let i = 0;
     const step = () => {
