@@ -280,10 +280,10 @@
       btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
       document.getElementById('eyeIcon').innerHTML = show ? eyeOff : eye;
     });
-    // Demo only: nothing is sent anywhere. Signing in opens the dashboard in the same tab.
+    // Demo only: nothing is sent anywhere. Signing in opens the returning-user dashboard in the same tab.
     document.getElementById('signinForm').addEventListener('submit', function(e){
       e.preventDefault();
-      window.location.href = 'dash%20phase%201.html';
+      window.location.href = 'return%20user.html';
     });
     // "Sign up" opens the sign-up screen in the same tab.
     document.querySelector('#signinForm .signup button').addEventListener('click', function(){ window.location.href = 'login.html'; });
